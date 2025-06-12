@@ -50,4 +50,4 @@ MIT License — feel free to contribute, fork, remix, whatever.
 
 ---
 
-Made by Kuba ❤️
+Made by Kuba with ❤️
