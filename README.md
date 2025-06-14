@@ -34,7 +34,7 @@ Coming soon.
 ## 📅 Roadmap
 
 - [x] Core lesson system  
-- [ ] Basic XP and level-up logic  
+- [x] Basic XP and level-up logic  
 - [ ] Code editor integration  
 - [ ] Leaderboards / community  
 - [ ] More languages (Python, JS, etc.)
