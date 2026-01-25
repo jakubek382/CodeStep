@@ -42,7 +42,7 @@ Coming soon.
 ## 🧪 Beta Testers
 
 Wanna help shape the future of CodeStep?  
-DM me on Discord: `@jakubek382` or `@kubagryalt_5` or just open an issue here.
+DM me on Discord: `@kuba390` or just open an issue here.
 
 ## 📜 License
 
