@@ -121,50 +121,57 @@ _CSPROJ = """<Project Sdk="Microsoft.NET.Sdk">
 def run(runner: Runner, lang, code: str, timeout: float = 10.0) -> RunResult:
     if runner.path == "<in-process>":
         return _exec_in_process(code, timeout)
-
     with tempfile.TemporaryDirectory(prefix="codestep_") as d:
-        src_name = "Main.java" if lang.id == "java" else "main" + lang.ext
-        src = os.path.join(d, src_name)
-        with open(src, "w", encoding="utf-8") as f:
-            f.write(code)
-        exe = os.path.join(d, "main" + EXE)
-        t, p = runner.tool, runner.path
-        slow = max(timeout, 120.0)  # first compile of JVM/.NET is slow
+        res = _run_in(d, runner, lang, code, timeout)
+        # hide the temp folder from error messages: "/tmp/codestep_x/main.py" -> "main.py"
+        for p in (d + os.sep, d):
+            res.error = res.error.replace(p, "")
+        return res
 
-        if t == "python":
-            return _run([p, "-I", src], d, timeout)
-        if t in ("node", "bun", "tsx", "ruby", "php", "lua", "lua5.4", "lua54", "luajit"):
-            return _run([p, src], d, timeout)
-        if t == "deno":
-            return _run([p, "run", "--quiet", src], d, timeout)
-        if t == "java":
-            return _run([p, src], d, max(timeout, 30.0))
-        if t == "go":
-            return _run([p, "run", src], d, max(timeout, 60.0))
-        if t in ("gcc", "clang", "cc"):
-            r = _run([p, src, "-o", exe], d, max(timeout, 30.0))
-            return r if not r.ok else _run([exe], d, timeout)
-        if t in ("g++", "clang++"):
-            r = _run([p, "-std=c++17", src, "-o", exe], d, max(timeout, 30.0))
-            return r if not r.ok else _run([exe], d, timeout)
-        if t == "rustc":
-            r = _run([p, "--edition", "2021", src, "-o", exe], d, max(timeout, 60.0))
-            return r if not r.ok else _run([exe], d, timeout)
-        if t == "kotlinc":
-            jar = os.path.join(d, "main.jar")
-            r = _run([p, src, "-include-runtime", "-d", jar], d, slow)
-            return r if not r.ok else _run([shutil.which("java") or "java", "-jar", jar], d, timeout)
-        if t == "dotnet":
-            with open(os.path.join(d, "app.csproj"), "w", encoding="utf-8") as f:
-                f.write(_CSPROJ.format(tfm=_dotnet_tfm(p)))
-            env = dict(os.environ, DOTNET_NOLOGO="1", DOTNET_CLI_TELEMETRY_OPTOUT="1",
-                       DOTNET_SKIP_FIRST_TIME_EXPERIENCE="1")
-            r = _run([p, "build", "-nologo", "-v", "q", "-o", os.path.join(d, "out")], d, slow, env)
-            if not r.ok:
-                return r
-            dll = os.path.join(d, "out", "app.dll")
-            return _run([p, dll], d, timeout, env)
-        return RunResult(False, "", f"Don't know how to run {t}")
+
+def _run_in(d, runner: Runner, lang, code: str, timeout: float) -> RunResult:
+    src_name = "Main.java" if lang.id == "java" else "main" + lang.ext
+    src = os.path.join(d, src_name)
+    with open(src, "w", encoding="utf-8") as f:
+        f.write(code)
+    exe = os.path.join(d, "main" + EXE)
+    t, p = runner.tool, runner.path
+    slow = max(timeout, 120.0)  # first compile of JVM/.NET is slow
+
+    if t == "python":
+        return _run([p, "-I", src], d, timeout)
+    if t in ("node", "bun", "tsx", "ruby", "php", "lua", "lua5.4", "lua54", "luajit"):
+        return _run([p, src], d, timeout)
+    if t == "deno":
+        return _run([p, "run", "--quiet", src], d, timeout)
+    if t == "java":
+        return _run([p, src], d, max(timeout, 30.0))
+    if t == "go":
+        return _run([p, "run", src], d, max(timeout, 60.0))
+    if t in ("gcc", "clang", "cc"):
+        r = _run([p, src, "-o", exe], d, max(timeout, 30.0))
+        return r if not r.ok else _run([exe], d, timeout)
+    if t in ("g++", "clang++"):
+        r = _run([p, "-std=c++17", src, "-o", exe], d, max(timeout, 30.0))
+        return r if not r.ok else _run([exe], d, timeout)
+    if t == "rustc":
+        r = _run([p, "--edition", "2021", src, "-o", exe], d, max(timeout, 60.0))
+        return r if not r.ok else _run([exe], d, timeout)
+    if t == "kotlinc":
+        jar = os.path.join(d, "main.jar")
+        r = _run([p, src, "-include-runtime", "-d", jar], d, slow)
+        return r if not r.ok else _run([shutil.which("java") or "java", "-jar", jar], d, timeout)
+    if t == "dotnet":
+        with open(os.path.join(d, "app.csproj"), "w", encoding="utf-8") as f:
+            f.write(_CSPROJ.format(tfm=_dotnet_tfm(p)))
+        env = dict(os.environ, DOTNET_NOLOGO="1", DOTNET_CLI_TELEMETRY_OPTOUT="1",
+                   DOTNET_SKIP_FIRST_TIME_EXPERIENCE="1")
+        r = _run([p, "build", "-nologo", "-v", "q", "-o", os.path.join(d, "out")], d, slow, env)
+        if not r.ok:
+            return r
+        dll = os.path.join(d, "out", "app.dll")
+        return _run([p, dll], d, timeout, env)
+    return RunResult(False, "", f"Don't know how to run {t}")
 
 
 def normalize_output(text: str) -> str:

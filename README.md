@@ -16,6 +16,10 @@ It’s built to be **light**, **offline**, and **fast** — no bloated nonsense.
 
 ## 🧩 Features
 
+- ✨ Fully animated UI: splash intro, swipe transitions, glowing gradient buttons, floating particles, a Duolingo-style lesson path, confetti, level-up and lesson-complete celebrations
+- 🎨 Each language has its own colour theme that the whole app fades into
+- 🖊️ Real code editor: line numbers, syntax highlighting, auto-indent, bracket pairing, `Ctrl+Enter` to run
+
 - 🎓 Beginner-friendly interface
 - 🎮 Feels like a game, not school
 - 🔧 Built in Python (with 💡 passion)
@@ -37,7 +41,8 @@ Python keeps its original hand-written lessons (including the "fix the code" les
 
 ## 🛠️ Tech Stack
 
-- Python 3.10+ with customtkinter
+- Python 3.10+ and plain tkinter (no UI libraries): everything is drawn on one animated canvas
+- `codestep/ui/` – the interface: animation engine (tweens, easing, confetti, glow, gradients), learning-path home screen, code editor with syntax highlighting / auto-indent / bracket pairing
 - `codestep/` package:
   - `ir.py` – tiny language-neutral program format the shared lessons are written in
   - `languages.py` – one renderer per language (add a class to add a language)
@@ -56,7 +61,7 @@ Build the Windows exe:
 
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name CodeStep --add-data "assets;assets" main.py
+pyinstaller --onefile --windowed --name CodeStep main.py
 ```
 
 Run the tests (every answer in every language is compiled and run where the toolchain exists):
