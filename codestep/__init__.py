@@ -1,0 +1,2 @@
+"""CodeStep core: lessons, language renderers, code checker and progress."""
+__version__ = "1.1.0-alpha"

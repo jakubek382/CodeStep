@@ -20,24 +20,58 @@ It’s built to be **light**, **offline**, and **fast** — no bloated nonsense.
 - 🎮 Feels like a game, not school
 - 🔧 Built in Python (with 💡 passion)
 
+## 🌍 Languages (v1.1.0)
+
+13 languages, 5 lessons × 10 tasks each (650 tasks):
+
+Python · JavaScript · TypeScript · Java · C · C++ · C# · Go · Rust · Kotlin · Ruby · PHP · Lua
+
+Lessons: **Output → Variables & Math → Conditionals → Loops → Functions**.
+Python keeps its original hand-written lessons (including the "fix the code" lesson).
+
+### How your code is checked
+
+- If the language's toolchain is installed (e.g. `node`, `gcc`, `go`, `rustc`, `java`, `dotnet`, `kotlinc`, `php`, `ruby`, `lua`), CodeStep **runs your code** and compares the output, so any correct solution passes. Tasks can also require certain keywords/names (e.g. "use a while loop").
+- If not, it compares your code with the reference solution, ignoring spacing, comments and quote style.
+- Python always runs: it's built in.
+
 ## 🛠️ Tech Stack
 
-- Python 3.x
-- Your creativity™
+- Python 3.10+ with customtkinter
+- `codestep/` package:
+  - `ir.py` – tiny language-neutral program format the shared lessons are written in
+  - `languages.py` – one renderer per language (add a class to add a language)
+  - `curriculum.py` – lessons
+  - `checker.py` / `runner.py` – checking and running code
+  - `progress.py` – save file (`~/Documents/CodeStep/progress_data.json`, v1 saves migrate automatically)
 
 ## 📦 Installation
 
-Coming soon.
+```bash
+pip install -r requirements.txt
+python main.py
+```
 
-> In dev phase — testers welcome!
+Build the Windows exe:
+
+```bash
+pip install pyinstaller
+pyinstaller --onefile --windowed --name CodeStep --add-data "assets;assets" main.py
+```
+
+Run the tests (every answer in every language is compiled and run where the toolchain exists):
+
+```bash
+python -m pytest -q
+```
 
 ## 📅 Roadmap
 
 - [x] Core lesson system  
 - [x] Basic XP and level-up logic  
-- [ ] Code editor integration  
+- [x] Code editor integration  
 - [ ] Leaderboards / community  
-- [ ] More languages (Python, JS, etc.)
+- [x] More languages (13 so far)
 
 ## 🧪 Beta Testers
 
